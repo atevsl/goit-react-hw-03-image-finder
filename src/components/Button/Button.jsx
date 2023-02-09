@@ -1,8 +1,12 @@
 import React from 'react';
 import css from './Button.module.css';
-const Button = () => {
+const Button = props => {
   return (
-    <button type="button" className={css.Button}>
+    <button
+      type="button"
+      className={css.Button}
+      onClick={props.onLoadMoreHendler}
+    >
       Load more
     </button>
   );
