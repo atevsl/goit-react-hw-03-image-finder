@@ -1,17 +1,22 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import css from './Searchbar.module.css';
+
 class Searchbar extends React.Component {
   state = {
     imgName: '',
   };
+
   onInputHendler = e => {
     this.setState({ imgName: e.currentTarget.value });
   };
+
   onSubmitHendler = e => {
     e.preventDefault();
     this.props.onSubmitHendler(this.state.imgName);
     this.setState({ imgName: '' });
   };
+
   render() {
     return (
       <header className={css.Searchbar}>
@@ -34,4 +39,9 @@ class Searchbar extends React.Component {
     );
   }
 }
+
+Searchbar.propTypes = {
+  onSubmitHendler: PropTypes.func.isRequired,
+};
+
 export default Searchbar;

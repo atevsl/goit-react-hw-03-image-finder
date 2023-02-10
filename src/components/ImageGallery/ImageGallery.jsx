@@ -1,15 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import css from './ImageGallery.module.css';
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
-// import Modal from '../Modal/Modal';
 
 const ImageGallery = ({ imgsToDisplay, onModalShow }) => {
   return (
     <ul
       className={css.ImageGallery}
       onClick={e => {
-        console.log('клик по картинке', e.target.src);
-        // <Modal img={}></Modal>;
         onModalShow(e.target);
       }}
     >
@@ -19,10 +17,17 @@ const ImageGallery = ({ imgsToDisplay, onModalShow }) => {
             webformatURL={img.webformatURL}
             tags={img.tags}
             key={img.id}
+            largeImageURL={img.largeImageURL}
           ></ImageGalleryItem>
         );
       })}
     </ul>
   );
 };
+
+ImageGallery.propTypes = {
+  imgsToDisplay: PropTypes.array.isRequired,
+  onModalShow: PropTypes.func.isRequired,
+};
+
 export default ImageGallery;

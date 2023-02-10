@@ -1,37 +1,71 @@
-import Modal from '../Modal/Modal';
 import React from 'react';
 import Button from '../Button/Button';
 import ImageGallery from '../ImageGallery/ImageGallery';
 import Loader from '../Loader/Loader';
 import Searchbar from '../Searchbar/Searchbar';
-
+import Oops from 'components/Oops/Oops';
 import css from './App.module.css';
+
 const APIkey = '32042597-d449e2f3b6adbf69100237dc7';
-// const Status = {
-//   IDLE: 'idle',
-//   PENDING: 'pending',
-//   RESOLVED: 'resolved',
-//   REJECTED: 'rejected',
-// };
+const Status = {
+  IDLE: 'idle',
+  PENDING: 'pending',
+  RESOLVED: 'resolved',
+  REJECTED: 'rejected',
+};
 
 export class App extends React.Component {
   state = {
     imgSearchName: '',
     imgsToDisplay: [],
     page: 1,
-    loading: false,
-    loadingFailure: false,
     img: null,
+    status: Status.IDLE,
+    total: 0,
   };
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.imgSearchName !== this.state.imgSearchName ||
+      prevState.page !== this.state.page
+    ) {
+      if (this.state.imgSearchName.trim() === '') {
+        return this.setState({ status: Status.REJECTED });
+      }
+      this.setState({ status: Status.PENDING });
+      this.onFetchHendler()
+        .then(data => {
+          if (data.total === 0) {
+            this.setState({ status: Status.REJECTED });
+            return;
+          }
+          this.setState(prevstate => ({
+            imgsToDisplay: [...prevstate.imgsToDisplay, ...data.hits],
+            total: data.totalHits,
+            status: Status.RESOLVED,
+          }));
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
+  }
+
   onSubmitHendler = imgSearchName => {
-    this.setState({ imgSearchName });
+    this.setState({
+      imgSearchName,
+      page: 1,
+      imgsToDisplay: [],
+    });
   };
+
   onLoadMoreHendler = () => {
     this.setState(prevstate => ({ page: prevstate.page + 1 }));
   };
+
   onFetchHendler = () => {
     return fetch(
-      `https://pixabay.com/api/?q=${this.state.imgSearchName}&page=1&key=${APIkey}&image_type=photo&orientation=horizontal&per_page=12&page=${this.state.page}`
+      `https://pixabay.com/api/?q=${this.state.imgSearchName}&key=${APIkey}&image_type=photo&orientation=horizontal&per_page=12&page=${this.state.page}`
     ).then(response => {
       if (!response.ok) {
         throw new Error('there are no such image, please try again.');
@@ -39,62 +73,27 @@ export class App extends React.Component {
       return response.json();
     });
   };
+
   onModalShow = img => {
-    console.log('open in modal :', img);
     this.setState({ img });
   };
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.imgSearchName !== this.state.imgSearchName) {
-      this.setState({ page: 1, loading: true, loadingFailure: false });
 
-      this.onFetchHendler()
-        .then(data => {
-          if (data.total === 0) {
-            this.setState({ loadingFailure: true });
-            return;
-          }
-          this.setState({ imgsToDisplay: data.hits, loading: false });
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(this.setState({ oading: false }));
-    }
-    if (prevState.page !== this.state.page) {
-      this.setState({ loading: true });
-      this.onFetchHendler()
-        .then(data => {
-          this.setState(prevstate => ({
-            imgsToDisplay: [...prevstate.imgsToDisplay, ...data.hits],
-          }));
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(this.setState({ loading: false }));
-    }
-  }
   render() {
+    const totalPage =
+      this.state.imgsToDisplay.length / (this.state.page * this.state.total);
     return (
       <div className={css.AppWrap}>
         <Searchbar onSubmitHendler={this.onSubmitHendler}></Searchbar>
-        {this.state.img && <Modal img={this.state.img}></Modal>}
 
-        {!this.state.loading && this.state.imgsToDisplay.length !== 0 && (
-          <ImageGallery
-            imgsToDisplay={this.state.imgsToDisplay}
-            onModalShow={this.onModalShow}
-          ></ImageGallery>
+        <ImageGallery
+          imgsToDisplay={this.state.imgsToDisplay}
+          onModalShow={this.onModalShow}
+        ></ImageGallery>
+        {this.state.status === 'pending' && <Loader></Loader>}
+        {this.state.status === 'rejected' && (
+          <Oops imgSearchName={this.state.imgSearchName}></Oops>
         )}
-
-        {this.state.loading && <Loader></Loader>}
-        {this.state.loadingFailure && (
-          <p>
-            Oops! Sorry, we couldnt find {this.state.imgSearchName}, what you
-            are looking for. 😭
-          </p>
-        )}
-        {this.state.imgsToDisplay.length !== 0 && !this.state.loading && (
+        {totalPage < 1 && this.state.status === 'resolved' && (
           <Button onLoadMoreHendler={this.onLoadMoreHendler}></Button>
         )}
       </div>
