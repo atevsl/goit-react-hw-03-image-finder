@@ -3,14 +3,9 @@ import PropTypes from 'prop-types';
 import css from './ImageGallery.module.css';
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 
-const ImageGallery = ({ imgsToDisplay, onModalShow }) => {
+const ImageGallery = ({ imgsToDisplay }) => {
   return (
-    <ul
-      className={css.ImageGallery}
-      onClick={e => {
-        onModalShow(e.target);
-      }}
-    >
+    <ul className={css.ImageGallery}>
       {imgsToDisplay.map(img => {
         return (
           <ImageGalleryItem
@@ -27,7 +22,6 @@ const ImageGallery = ({ imgsToDisplay, onModalShow }) => {
 
 ImageGallery.propTypes = {
   imgsToDisplay: PropTypes.array.isRequired,
-  onModalShow: PropTypes.func.isRequired,
 };
 
 export default ImageGallery;

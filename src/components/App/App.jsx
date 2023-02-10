@@ -5,8 +5,8 @@ import Loader from '../Loader/Loader';
 import Searchbar from '../Searchbar/Searchbar';
 import Oops from 'components/Oops/Oops';
 import css from './App.module.css';
+import onFetchHendler from '../../services/onFetchHendler';
 
-const APIkey = '32042597-d449e2f3b6adbf69100237dc7';
 const Status = {
   IDLE: 'idle',
   PENDING: 'pending',
@@ -33,7 +33,7 @@ export class App extends React.Component {
         return this.setState({ status: Status.REJECTED });
       }
       this.setState({ status: Status.PENDING });
-      this.onFetchHendler()
+      onFetchHendler(this.state.imgSearchName, this.state.page)
         .then(data => {
           if (data.total === 0) {
             this.setState({ status: Status.REJECTED });
@@ -63,20 +63,16 @@ export class App extends React.Component {
     this.setState(prevstate => ({ page: prevstate.page + 1 }));
   };
 
-  onFetchHendler = () => {
-    return fetch(
-      `https://pixabay.com/api/?q=${this.state.imgSearchName}&key=${APIkey}&image_type=photo&orientation=horizontal&per_page=12&page=${this.state.page}`
-    ).then(response => {
-      if (!response.ok) {
-        throw new Error('there are no such image, please try again.');
-      }
-      return response.json();
-    });
-  };
-
-  onModalShow = img => {
-    this.setState({ img });
-  };
+  // onFetchHendler = () => {
+  //   return fetch(
+  //     `https://pixabay.com/api/?q=${this.state.imgSearchName}&key=${APIkey}&image_type=photo&orientation=horizontal&per_page=12&page=${this.state.page}`
+  //   ).then(response => {
+  //     if (!response.ok) {
+  //       throw new Error('there are no such image, please try again.');
+  //     }
+  //     return response.json();
+  //   });
+  // };
 
   render() {
     const totalPage =
@@ -85,11 +81,18 @@ export class App extends React.Component {
       <div className={css.AppWrap}>
         <Searchbar onSubmitHendler={this.onSubmitHendler}></Searchbar>
 
-        <ImageGallery
-          imgsToDisplay={this.state.imgsToDisplay}
-          onModalShow={this.onModalShow}
-        ></ImageGallery>
-        {this.state.status === 'pending' && <Loader></Loader>}
+        <ImageGallery imgsToDisplay={this.state.imgsToDisplay}></ImageGallery>
+        {this.state.status === 'pending' && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              flexDirection: 'column',
+            }}
+          >
+            <Loader></Loader>
+          </div>
+        )}
         {this.state.status === 'rejected' && (
           <Oops imgSearchName={this.state.imgSearchName}></Oops>
         )}
