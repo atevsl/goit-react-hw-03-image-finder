@@ -63,17 +63,6 @@ export class App extends React.Component {
     this.setState(prevstate => ({ page: prevstate.page + 1 }));
   };
 
-  // onFetchHendler = () => {
-  //   return fetch(
-  //     `https://pixabay.com/api/?q=${this.state.imgSearchName}&key=${APIkey}&image_type=photo&orientation=horizontal&per_page=12&page=${this.state.page}`
-  //   ).then(response => {
-  //     if (!response.ok) {
-  //       throw new Error('there are no such image, please try again.');
-  //     }
-  //     return response.json();
-  //   });
-  // };
-
   render() {
     const totalPage =
       this.state.imgsToDisplay.length / (this.state.page * this.state.total);
