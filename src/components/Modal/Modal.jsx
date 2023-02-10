@@ -4,7 +4,7 @@ const Modal = props => {
   return (
     <div className={css.Overlay}>
       <div className={css.Modal}>
-        <img src={props.img.largeImageURL} alt={props.img.tags} />
+        <img src={props.img.src} alt={props.img.alt} />
       </div>
     </div>
   );

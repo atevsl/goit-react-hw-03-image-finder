@@ -1,9 +1,9 @@
+import Modal from '../Modal/Modal';
 import React from 'react';
 import Button from '../Button/Button';
 import ImageGallery from '../ImageGallery/ImageGallery';
 import Loader from '../Loader/Loader';
 import Searchbar from '../Searchbar/Searchbar';
-// import Modal from '../Modal/Modal';
 
 import css from './App.module.css';
 const APIkey = '32042597-d449e2f3b6adbf69100237dc7';
@@ -21,6 +21,7 @@ export class App extends React.Component {
     page: 1,
     loading: false,
     loadingFailure: false,
+    img: null,
   };
   onSubmitHendler = imgSearchName => {
     this.setState({ imgSearchName });
@@ -38,7 +39,10 @@ export class App extends React.Component {
       return response.json();
     });
   };
-
+  onModalShow = img => {
+    console.log('open in modal :', img);
+    this.setState({ img });
+  };
   componentDidUpdate(prevProps, prevState) {
     if (prevState.imgSearchName !== this.state.imgSearchName) {
       this.setState({ page: 1, loading: true, loadingFailure: false });
@@ -74,7 +78,9 @@ export class App extends React.Component {
     return (
       <div className={css.AppWrap}>
         <Searchbar onSubmitHendler={this.onSubmitHendler}></Searchbar>
-        {!this.state.loading && (
+        {this.state.img && <Modal img={this.state.img}></Modal>}
+
+        {!this.state.loading && this.state.imgsToDisplay.length !== 0 && (
           <ImageGallery
             imgsToDisplay={this.state.imgsToDisplay}
             onModalShow={this.onModalShow}
