@@ -21,7 +21,14 @@ const ImageGallery = ({ imgsToDisplay }) => {
 };
 
 ImageGallery.propTypes = {
-  imgsToDisplay: PropTypes.array.isRequired,
+  imgsToDisplay: PropTypes.arrayOf(
+    PropTypes.shape({
+      webformatURL: PropTypes.string.isRequired,
+      tags: PropTypes.string.isRequired,
+      id: PropTypes.number.isRequired,
+      largeImageURL: PropTypes.string.isRequired,
+    })
+  ).isRequired,
 };
 
 export default ImageGallery;
